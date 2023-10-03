@@ -22,6 +22,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,14 +31,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.woof.data.Dog
 import com.example.woof.data.dogs
 import com.example.woof.ui.theme.WoofTheme
@@ -65,11 +79,24 @@ class MainActivity : ComponentActivity() {
 fun WoofApp() {
     LazyColumn {
         items(dogs) {
-            DogItem(dog = it)
+            DogItem(dog = it,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_small))
+                    )
         }
     }
 }
+@Composable
+fun CountWithButton(){
+    Column(modifier = Modifier.padding(16.dp)){
+        var count by remember { mutableStateOf(0)}
+        Text("You've had ${count} number of glasses")
+        Button(onClick = { count = count + 1 }, modifier = Modifier.padding(8.dp)) {
+            Text("Add one")
+        }
 
+    }
+}
 /**
  * Composable that displays a list item containing a dog icon and their information.
  *
@@ -81,14 +108,23 @@ fun DogItem(
     dog: Dog,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_small))
-    ) {
-        DogIcon(dog.imageResourceId)
-        DogInformation(dog.name, dog.age)
+    Card(modifier = modifier
+    , colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ){
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                // .background(MaterialTheme.colorScheme.primary)
+                .padding(dimensionResource(R.dimen.padding_small))
+
+        ) {
+            DogIcon(dog.imageResourceId)
+            DogInformation(dog.name, dog.age)
+        }
     }
+
 }
 
 /**
@@ -105,7 +141,9 @@ fun DogIcon(
     Image(
         modifier = modifier
             .size(dimensionResource(R.dimen.image_size))
-            .padding(dimensionResource(R.dimen.padding_small)),
+            .padding(dimensionResource(R.dimen.padding_small))
+            .clip(MaterialTheme.shapes.small),
+        contentScale = ContentScale.Crop,
         painter = painterResource(dogIcon),
 
         // Content Description is not needed here - image is decorative, and setting a null content
@@ -131,7 +169,8 @@ fun DogInformation(
     Column(modifier = modifier) {
         Text(
             text = stringResource(dogName),
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small)),
+
         )
         Text(
             text = stringResource(R.string.years_old, dogAge),
@@ -145,7 +184,7 @@ fun DogInformation(
 @Preview
 @Composable
 fun WoofPreview() {
-    WoofTheme(darkTheme = false) {
+    WoofTheme(darkTheme = true) {
         WoofApp()
     }
 }
